@@ -275,6 +275,11 @@ uv run pre-commit install
 # Запуск pre-commit
 uv run pre-commit run --all-files
 
+# Ruff
+uv run ruff format
+uv run ruff check --fix
+
 # Запуск скрипта
-uv run python -m src.yo_pairs.cli
+# --validate {none,first,second,both}
+uv run python -m yo_pairs --validate both
 ```
