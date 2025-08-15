@@ -86,7 +86,7 @@ def write_output(
 ) -> None:
     with open(filename, 'w', encoding='utf-8') as f:
         f.write(
-            "| Index | Word with 'ё' | Lemma and derived forms | Word with 'е' | Lemma and derived forms | Combined Frequency |\n"
+            "| Index | Word with 'ё' | Lemmas and derived forms | Word with 'е' | Lemmas and derived forms | Combined Frequency |\n"
         )
         f.write('|-|-|-|-|-|-|\n')
         for idx, (yo, e, freq, yo_lemmas, e_lemmas) in enumerate(
@@ -107,5 +107,5 @@ def write_output(
                 f'| {idx} | {yo} | {yo_block} | {e} | {e_block} | {freq} |\n'
             )
 
-    add_to_readme(results_path=filename, readme_path='README.md', lines=5)
-    add_to_readme(results_path=filename, readme_path='README.en.md', lines=5)
+    add_to_readme(results_path=filename, readme_path='README.md', lines=7)
+    add_to_readme(results_path=filename, readme_path='README.en.md', lines=7)
