@@ -7,7 +7,7 @@ from typing import Iterable, List, Tuple
 def add_to_readme(
     results_path: str,
     readme_path: str = 'README.md',
-    lines: int = 22,
+    lines: int = 7,
     marker_start: str = '<!-- results table start -->',
     marker_end: str = '<!-- results table end -->',
     append_if_missing: bool = True,
@@ -110,5 +110,5 @@ def write_output(
                 f'| {idx} | {yo} | {yo_block} | {e} | {e_block} | {freq} |\n'
             )
 
-    add_to_readme(results_path=filename, readme_path='README.md', lines=7)
-    add_to_readme(results_path=filename, readme_path='README.en.md', lines=7)
+    add_to_readme(results_path=filename, readme_path='README.md', lines=12)
+    add_to_readme(results_path=filename, readme_path='README.en.md', lines=12)
