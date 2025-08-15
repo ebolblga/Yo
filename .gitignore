@@ -1,0 +1,6 @@
+/.env
+/.ruff_cache
+/.venv
+/.vscode
+/raw
+/src/yo_pairs/__pycache__

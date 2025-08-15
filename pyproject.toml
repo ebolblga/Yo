@@ -1,0 +1,73 @@
+[project]
+name = "yo"
+version = "0.2.0"
+description = "Нужна ли буква 'Ё'?"
+readme = "README.md"
+license = "LICENSE.md"
+authors = [
+    { name = "eboblga" }
+]
+
+requires-python = ">=3.10"
+
+dependencies = [
+    "dotenv>=0.9.9",
+    "requests>=2.32.4",
+]
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.2.0",
+    "pyright>=1.1.403",
+    "ruff>=0.12.8",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+exclude = [
+    ".git",
+    ".ipynb_checkpoints",
+    ".ruff_cache",
+    ".venv",
+    ".vscode",
+    "venv",
+    "__pycache__",
+    "output",
+    "raw",
+]
+fix = true
+indent-width = 4
+line-length = 79
+
+[tool.ruff.lint]
+select = [
+    "ANN",
+    "B",
+    "E",
+    "F",
+    "I",
+    "T",
+]
+ignore = [
+    "T201",
+    "E501",
+]
+fixable = ["ALL"]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+
+[tool.ruff.format]
+quote-style = "single"
+docstring-code-format = true
+
+[tool.pyright]
+include = [
+    "src/",
+]
+typeCheckingMode = "basic"
+pythonVersion = "3.10"
+venvPath = "."
+venv = ".venv"
