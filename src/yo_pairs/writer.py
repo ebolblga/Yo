@@ -85,8 +85,11 @@ def write_output(
     filename: str,
 ) -> None:
     with open(filename, 'w', encoding='utf-8') as f:
+        # f.write(
+        #     "| Index | Word with 'ё' | Lemmas and derived forms | Word with 'е' | Lemmas and derived forms | Combined Frequency |\n"
+        # )
         f.write(
-            "| Index | Word with 'ё' | Lemmas and derived forms | Word with 'е' | Lemmas and derived forms | Combined Frequency |\n"
+            "| Индекс | Слово с 'ё' | Леммы и производные формы | Слово с 'е' | Леммы и производные формы | Комбинированная частота |\n"
         )
         f.write('|-|-|-|-|-|-|\n')
         for idx, (yo, e, freq, yo_lemmas, e_lemmas) in enumerate(
