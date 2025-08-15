@@ -1,5 +1,8 @@
 import sys
+from os import getenv
 from typing import List, Optional, Set, Tuple
+
+from dotenv import load_dotenv
 
 from .downloader import ensure_local_copy, read_local_text
 from .pair_finder import find_ё_pairs
@@ -7,13 +10,23 @@ from .parser import parse_frequency_map
 from .validator import is_word_valid, load_wordset_from_text
 from .writer import write_output
 
-RAW_FREQ_URL = 'https://raw.githubusercontent.com/Baksalyar/mc.hertzbeat.ru-Frequency-Dictionaries/master/mc.hertzbeat.ru_frequency_dict.txt'
-RAW_FREQ_PATH = 'raw/mc.hertzbeat.ru_frequency_dict.txt'
+load_dotenv('.env')
 
-VALIDATOR_URL = 'https://raw.githubusercontent.com/ebolblga/car-p18s/master/public/Library/russianUTF-8.txt'
-VALIDATOR_PATH = 'raw/russianUTF-8.txt'
+RAW_FREQ_URL = getenv(
+    'RAW_FREQ_URL',
+    'https://raw.githubusercontent.com/Baksalyar/mc.hertzbeat.ru-Frequency-Dictionaries/master/mc.hertzbeat.ru_frequency_dict.txt',
+)
+RAW_FREQ_PATH = getenv(
+    'RAW_FREQ_PATH', 'raw/mc.hertzbeat.ru_frequency_dict.txt'
+)
 
-OUT_PATH_DEFAULT = 'output/result.md'
+VALIDATOR_URL = getenv(
+    'VALIDATOR_URL',
+    'https://raw.githubusercontent.com/ebolblga/car-p18s/master/public/Library/russianUTF-8.txt',
+)
+VALIDATOR_PATH = getenv('VALIDATOR_PATH', 'raw/russianUTF-8.txt')
+
+OUT_PATH_DEFAULT = getenv('OUT_PATH_DEFAULT', 'output/result.md')
 
 
 def filter_pairs(
