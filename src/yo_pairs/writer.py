@@ -68,4 +68,5 @@ def write_output(pairs: List[Tuple[str, str, int]], filename: str) -> None:
         for idx, (yo, e, freq) in enumerate(pairs, 1):
             f.write(f'| {idx} | {yo} | {e} | {freq} |\n')
 
-    add_to_readme(filename, lines=22)
+    add_to_readme(results_path=filename, readme_path='README.md', lines=22)
+    add_to_readme(results_path=filename, readme_path='README.en.md', lines=22)
