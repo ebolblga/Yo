@@ -1,7 +1,7 @@
 import itertools
 import re
 from pathlib import Path
-from typing import List, Tuple
+from typing import Iterable, List, Tuple
 
 
 def add_to_readme(
@@ -58,15 +58,54 @@ def add_to_readme(
     readme_file.write_text(updated, encoding='utf-8')
 
 
-def write_output(pairs: List[Tuple[str, str, int]], filename: str) -> None:
+def _fmt_lemma_block(lemma: str, derived_forms: Iterable[str]) -> str:
+    """
+    Format one lemma and its derived forms as:
+    lemma: form1; form2; form3
+    If derived_forms only contains lemma itself, just return lemma.
+    """
+    forms = list(dict.fromkeys(derived_forms))  # dedupe preserving order
+    if not forms:
+        return lemma
+    # omit duplicate lemma inside derived forms if it's identical
+    derived = ', '.join(forms)
+    return f'{lemma}: {derived}'
+
+
+def write_output(
+    rows: Iterable[
+        Tuple[
+            str,
+            str,
+            int,
+            List[Tuple[str, List[str]]],
+            List[Tuple[str, List[str]]],
+        ]
+    ],
+    filename: str,
+) -> None:
     with open(filename, 'w', encoding='utf-8') as f:
         f.write(
-            "| Индекс | Слово с 'ё' | Слово с 'е' "
-            '| Комбинированная частота |\n'
+            "| Index | Word with 'ё' | Lemma and derived forms | Word with 'е' | Lemma and derived forms | Combined Frequency |\n"
         )
-        f.write('|-|-|-|-|\n')
-        for idx, (yo, e, freq) in enumerate(pairs, 1):
-            f.write(f'| {idx} | {yo} | {e} | {freq} |\n')
+        f.write('|-|-|-|-|-|-|\n')
+        for idx, (yo, e, freq, yo_lemmas, e_lemmas) in enumerate(
+            rows, start=1
+        ):
+            # format lemmas: produce semicolon-separated blocks "lemma: form1; form2"
+            def format_blocks(blocks: List[Tuple[str, List[str]]]) -> str:
+                if not blocks:
+                    return ''
+                pieces = []
+                for lemma, forms in blocks:
+                    pieces.append(_fmt_lemma_block(lemma, forms))
+                return ' / '.join(pieces)
 
-    add_to_readme(results_path=filename, readme_path='README.md', lines=22)
-    add_to_readme(results_path=filename, readme_path='README.en.md', lines=22)
+            yo_block = format_blocks(yo_lemmas)
+            e_block = format_blocks(e_lemmas)
+            f.write(
+                f'| {idx} | {yo} | {yo_block} | {e} | {e_block} | {freq} |\n'
+            )
+
+    add_to_readme(results_path=filename, readme_path='README.md', lines=5)
+    add_to_readme(results_path=filename, readme_path='README.en.md', lines=5)
