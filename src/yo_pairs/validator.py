@@ -17,23 +17,23 @@ def _prettify_stress(s: str) -> str:
     result: list[str] = []
     for ch in s:
         if ch in ("'", '`'):
-            # attach combining acute to previous character if available
+            # Attach combining acute to previous character if available
             if result:
                 result[-1] = result[-1] + '\u0301'
-            # if there's no previous character, skip the marker
+            # If there's no previous character, skip the marker
             continue
         result.append(ch)
     return ''.join(result)
 
 
-def load_zaliznjak_forms(
+def load_validation_file(
     text: str,
 ) -> Tuple[
     Dict[str, Set[str]], Dict[str, Set[str]], Dict[str, str], Dict[str, str]
 ]:
     """
     Parse zaliznjak forms text and return:
-      (form_to_lemmas, lemma_to_forms, form_display_map, lemma_display_map)
+        (form_to_lemmas, lemma_to_forms, form_display_map, lemma_display_map)
 
     - form_to_lemmas: form_key -> set(lemma_key)
     - lemma_to_forms: lemma_key -> set(form_key)
@@ -58,19 +58,19 @@ def load_zaliznjak_forms(
         form_raw = parts[0].strip()
         rest = parts[1].strip() if len(parts) > 1 else ''
 
-        # build clean key for the form
+        # Build clean key for the form
         form_clean = _clean_token(form_raw)
         if not form_clean:
             continue
         form_key = form_clean.casefold()
 
-        # build pretty/display version for the form (convert stress markers -> combining accents)
+        # Build pretty/display version for the form (convert stress markers -> combining accents)
         form_display = _prettify_stress(form_raw).strip()
-        # if prettified string is empty for some reason, fall back to cleaned form
+        # If prettified string is empty for some reason, fall back to cleaned form
         if not form_display:
             form_display = form_clean
 
-        # parse lemmas
+        # Parse lemmas
         lemmas_raw: list[str] = []
         if rest:
             if ',' in rest:
@@ -85,14 +85,14 @@ def load_zaliznjak_forms(
                         lemmas_raw.append(p)
             else:
                 lemmas_raw.append(rest.strip())
-        # if no lemma present, treat form as its own lemma
+        # If no lemma present, treat form as its own lemma
         if not lemmas_raw:
             lemmas_raw = [form_raw]
 
-        # ensure maps have entries
+        # Ensure maps have entries
         if form_key not in form_to_lemmas:
             form_to_lemmas[form_key] = set()
-        # save display
+        # Save display
         form_display_map[form_key] = form_display
 
         for lemma_raw in lemmas_raw:
@@ -100,11 +100,11 @@ def load_zaliznjak_forms(
             if not lemma_clean:
                 continue
             lemma_key = lemma_clean.casefold()
-            # pretty lemma for display
+            # Pretty lemma for display
             lemma_display = _prettify_stress(lemma_raw).strip() or lemma_clean
             lemma_display_map.setdefault(lemma_key, lemma_display)
 
-            # map relations
+            # Map relations
             form_to_lemmas[form_key].add(lemma_key)
             lemma_to_forms.setdefault(lemma_key, set()).add(form_key)
 

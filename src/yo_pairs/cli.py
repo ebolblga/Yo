@@ -1,3 +1,4 @@
+import argparse
 import os
 import sys
 from os import getenv
@@ -6,9 +7,9 @@ from typing import List, Optional, Tuple
 from dotenv import load_dotenv
 
 from .downloader import ensure_local_copy, read_local_text
-from .pair_finder import find_ё_pairs
+from .pair_finder import find_yo_pairs
 from .parser import parse_frequency_map
-from .validator import load_zaliznjak_forms
+from .validator import load_validation_file
 from .writer import write_output
 
 load_dotenv('.env')
@@ -59,10 +60,9 @@ def _get_lemma_blocks_for_word(
 
 def main(argv: Optional[list[str]] = None) -> None:
     argv = argv or sys.argv[1:]
-    import argparse
 
     ap = argparse.ArgumentParser(
-        description='Find ё->е pairs and expand with Zaliznjak lemmas/forms'
+        description='Find ё->е pairs and filter with Zaliznjak lemmas/forms'
     )
     ap.add_argument('--output', '-o', default=OUT_PATH_DEFAULT)
     ap.add_argument(
@@ -78,7 +78,7 @@ def main(argv: Optional[list[str]] = None) -> None:
     )
     args = ap.parse_args(argv)
 
-    # ensure frequency file
+    # Ensure frequency file
     try:
         if args.no_download and not os.path.exists(RAW_FREQ_PATH):
             raise RuntimeError(
@@ -89,7 +89,7 @@ def main(argv: Optional[list[str]] = None) -> None:
         print('Error ensuring frequency file:', e, file=sys.stderr)
         sys.exit(1)
 
-    # ensure zaliznjak forms file
+    # Ensure validation file
     try:
         if args.no_download and not os.path.exists(VALIDATOR_PATH):
             raise RuntimeError(
@@ -97,39 +97,42 @@ def main(argv: Optional[list[str]] = None) -> None:
             )
         ensure_local_copy(VALIDATOR_PATH, VALIDATOR_URL)
     except Exception as e:
-        print('Error ensuring zaliznjak forms file:', e, file=sys.stderr)
+        print('Error ensuring validation file:', e, file=sys.stderr)
         sys.exit(1)
 
-    # read frequency source
+    # Read frequency source
     try:
         freq_text = read_local_text(RAW_FREQ_PATH)
     except Exception as e:
         print('Failed to read frequency file:', e, file=sys.stderr)
         sys.exit(1)
 
-    # read zaliznjak forms using utf-8-sig to strip BOM if present
+    # Read validation source using utf-8-sig to strip BOM if present
     try:
         with open(VALIDATOR_PATH, 'r', encoding='utf-8-sig') as fh:
             zal_text = fh.read()
     except Exception as e:
-        print('Failed to read zaliznjak forms file:', e, file=sys.stderr)
+        print('Failed to read validation file:', e, file=sys.stderr)
         sys.exit(1)
 
-    # parse frequency map
+    # Parse frequency Map
     freq_map = parse_frequency_map(freq_text)
     if not freq_map:
-        print('No valid entries parsed from frequency source', file=sys.stderr)
+        print(
+            'No valid entries parsed from frequency source file.',
+            file=sys.stderr,
+        )
         sys.exit(1)
 
-    # find base pairs (yo_word, e_word, combined_freq)
-    pairs = find_ё_pairs(freq_map)
+    # Find base pairs (yo_word, e_word, combined_freq)
+    pairs = find_yo_pairs(freq_map)
 
-    # load zaliznjak mapping (returns form->lemmas, lemma->forms, form_display_map, lemma_display_map)
+    # Load zaliznjak mapping (returns form->lemmas, lemma->forms, form_display_map, lemma_display_map)
     form_to_lemmas, lemma_to_forms, form_display_map, lemma_display_map = (
-        load_zaliznjak_forms(zal_text)
+        load_validation_file(zal_text)
     )
 
-    # build final rows while applying validation mode
+    # Build final rows while applying validation mode
     final_rows: List[
         Tuple[
             str,
@@ -143,7 +146,7 @@ def main(argv: Optional[list[str]] = None) -> None:
         yo_key = yo.replace("'", '').replace('`', '').casefold()
         e_key = e.replace("'", '').replace('`', '').casefold()
 
-        # validation checks
+        # Validation checks
         if args.validate in ('first', 'both') and yo_key not in form_to_lemmas:
             continue
         if args.validate in ('second', 'both') and e_key not in form_to_lemmas:
@@ -166,12 +169,12 @@ def main(argv: Optional[list[str]] = None) -> None:
 
         final_rows.append((yo, e, freq, yo_blocks, e_blocks))
 
-    # final sort by combined frequency desc
+    # Final sort by combined frequency desc
     final_rows.sort(key=lambda t: t[2], reverse=True)
 
     if not final_rows:
-        print('No pairs after validation/filtering.')
+        print('No pairs after filtering.')
         return
 
     write_output(final_rows, args.output)
-    print(f'Wrote {len(final_rows)} pairs to {args.output}')
+    print(f'Wrote {len(final_rows)} pairs to {args.output}.')

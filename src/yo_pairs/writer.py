@@ -64,10 +64,10 @@ def _fmt_lemma_block(lemma: str, derived_forms: Iterable[str]) -> str:
     lemma: form1; form2; form3
     If derived_forms only contains lemma itself, just return lemma.
     """
-    forms = list(dict.fromkeys(derived_forms))  # dedupe preserving order
+    forms = list(dict.fromkeys(derived_forms))  # Dedupe preserving order
     if not forms:
         return lemma
-    # omit duplicate lemma inside derived forms if it's identical
+    # Omit duplicate lemma inside derived forms if it's identical
     derived = ', '.join(forms)
     return f'{lemma}: {derived}'
 
@@ -95,7 +95,7 @@ def write_output(
         for idx, (yo, e, freq, yo_lemmas, e_lemmas) in enumerate(
             rows, start=1
         ):
-            # format lemmas: produce semicolon-separated blocks "lemma: form1; form2"
+            # Format lemmas: produce semicolon-separated blocks "lemma: form1; form2"
             def format_blocks(blocks: List[Tuple[str, List[str]]]) -> str:
                 if not blocks:
                     return ''
