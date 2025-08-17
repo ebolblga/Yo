@@ -5,7 +5,7 @@ description = "Нужна ли буква 'Ё'?"
 readme = "README.md"
 license = "LICENSE.md"
 authors = [
-    { name = "eboblga" }
+    { name = "ebolblga" }
 ]
 
 requires-python = ">=3.10"
